@@ -123,12 +123,14 @@ if(isset($_GET['kw'])) {
 		$numrows=$DB->count("SELECT count(*) from log WHERE{$sql}");
 		$con='包含 '.$_GET['kw'].' 的共有 <b>'.$numrows.'</b> 个记录';
 	}
+
+  $queryStr = "?".$_SERVER["QUERY_STRING"];
 }else{
 	$numrows=$DB->count("SELECT count(*) from log WHERE 1");
 	$sql=" 1";
 	$con='系统共有 <b id="data-num">'.$numrows.'</b> 条记录&nbsp;';
 }
-$con.='<a href="./export.php" class="btn btn-primary btn-sm">导出列表</a>&nbsp;&nbsp;<a href="./index.php?my=qk" class="btn btn btn-danger btn-sm" onclick="return confirm(\'你确实要删除所有记录吗？\');">清空所有</a>&nbsp;&nbsp;<form style="margin: 20px 0;" class="form-inline" action="./" method="get"><div class="form-group"><label for="keyword">关键词</label><input type="text" class="form-control" placeholder="姓名或QQ号" id="keyword" name="kw"><label for="start-date">开始日期</label><input  class="form-control" type="date" id="start-date" name="start-date"/><label for="end-date">结束日期</label><input type="date"  class="form-control" id="end-date" name="end-date"/><input type="text" class="form-control" value="1" name="type" style="display: none;"></div><div class="checkbox"><label><input type="checkbox" name="over">超时</label></div><button type="submit" class="btn btn-primary">搜索</button></form>';
+$con.='<a href="#" id="export"class="btn btn-primary btn-sm">导出列表</a>&nbsp;&nbsp;<a href="./index.php?my=qk" class="btn btn btn-danger btn-sm" onclick="return confirm(\'你确实要删除所有记录吗？\');">清空所有</a>&nbsp;&nbsp;<form style="margin: 20px 0;" class="form-inline" action="./" method="get"><div class="form-group"><label for="keyword">关键词</label><input type="text" class="form-control" placeholder="姓名或QQ号" id="keyword" name="kw"><label for="start-date">开始日期</label><input  class="form-control" type="date" id="start-date" name="start-date"/><label for="end-date">结束日期</label><input type="date"  class="form-control" id="end-date" name="end-date"/><input type="text" class="form-control" value="1" name="type" style="display: none;"></div><div class="checkbox"><label><input type="checkbox" name="over">超时</label></div><button type="submit" class="btn btn-primary">搜索</button></form>';
 echo $con;
 ?>
       <div class="table-responsive">
@@ -197,24 +199,12 @@ echo'</ul>';
     </div>
   </div>
   <script type="text/javascript">
-  var timer = '';
-  $('#auto-update').on('click', function() {
-     if($(this).attr('aria-pressed') == 'false') {
-          timer = setInterval(function() {
-          $.get('./getnum.php', function(data) {
-            if(data)
-              $('#data-num').text(data);
-            else
-              console.log('请求失败')
-          });      
-        }, 10000);
-        $(this).button('complete');      
-      }else {
-        clearInterval(timer);
-        $(this).button('reset');
-      }
-  })
-
+    var queryStr = "<?php echo $queryStr ?>";
+    $('#export').click(function() {
+      window.location.href="export.php" + queryStr;
+      // console.log("export.php" + queryStr)
+    })
+    
   </script>
   </body>
 </html>
