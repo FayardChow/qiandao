@@ -128,7 +128,27 @@ switch($array['type']) {
             $re = mysql_query("INSERT INTO log (qq, name, item, add_time) VALUES ('$qq', '$name', '$str1', '$date')");
             
             if($re) {
-                $CQ->sendGroupMsg($group, $CQ->cqAt($qq)." $name 已经记录 " . $str1 . " " .date("H:i:s"));            
+                if(strpos($str1, '+') !== FALSE) {
+                    $item = explode("+", $str1);
+                    $re2 = mysql_query("SELECT * FROM item");  //所有事件
+
+                    $all_min = 0;  //设定的超时时间
+                    while ( $arr = mysql_fetch_array($re2)) {
+                        foreach ($item as $i) {
+                            if($arr['name'] == $i) {
+                                $all_min += $arr['time'];
+                            }
+                        }
+                    }
+                } else {
+                    $item = $str1;
+                    $re2 = mysql_query("SELECT * FROM item WHERE name='$item'");  //查找对应事件
+                    $arr = mysql_fetch_array($re2);
+                    $all_min = $arr['time'];
+                }
+
+
+                $CQ->sendGroupMsg($group, $CQ->cqAt($qq).$name."已经记录" . $str1 . ", 请在".$all_min."分钟内回来签'回' " .date("H:i:s"));            
             }else {
                 $CQ->sendGroupMsg($group,'数据库插入失败');
             }            

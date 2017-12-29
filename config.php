@@ -34,7 +34,7 @@ if($port!=80 && $url) $url .= ':'.$port;
  */
 $key = ''; //校验数据所需要的密钥
 $effectTime = 30; //数据有效期
-$qunhao = '690524789';   //签到群号
+
 
 
 $format = 'JSON'; //数据格式，如果使用 Key=Value 格式，请设置为 KV

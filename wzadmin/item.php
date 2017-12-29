@@ -24,18 +24,21 @@ if($islogin==1){}else exit("<script language='javascript'>window.location.href='
         <a class="navbar-brand" href="./">后台管理</a>
       </div><!-- /.navbar-header -->
       <div id="navbar" class="collapse navbar-collapse">
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <a href="./"><span class="glyphicon glyphicon-user"></span> 记录列表</a>
-          </li>
-          <li>
-            <a href="./stuff.php"><span class="glyphicon glyphicon-user"></span> 员工列表</a>
-          </li>
-          <li class="active">
-            <a href="./item.php"><span class="glyphicon glyphicon-user"></span> 事件列表</a>
-          </li>
-          <li><a href="./login.php?logout"><span class="glyphicon glyphicon-log-out"></span> 退出登陆</a></li>
-        </ul>
+	    <ul class="nav navbar-nav navbar-right">
+	      <li>
+	        <a href="./"><span class="glyphicon glyphicon-align-justify"></span> 记录列表</a>
+	      </li>
+	      <li>
+	        <a href="./stuff.php"><span class="glyphicon glyphicon-user"></span> 员工列表</a>
+	      </li>
+	      <li class="active">
+	        <a href="./item.php"><span class="glyphicon glyphicon-th-list"></span> 事件列表</a>
+	      </li>
+	      <li>
+	        <a href="./set.php"><span class="glyphicon glyphicon-cog"></span> 网站设置</a>
+	      </li>      
+	      <li><a href="./login.php?logout"><span class="glyphicon glyphicon-log-out"></span> 退出登陆</a></li>
+	    </ul>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container -->
   </nav><!-- /.navbar -->

@@ -26,14 +26,17 @@ if($islogin==1){}else exit("<script language='javascript'>window.location.href='
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
           <li class="active">
-            <a href="./"><span class="glyphicon glyphicon-user"></span> 记录列表</a>
+            <a href="./"><span class="glyphicon glyphicon-align-justify"></span> 记录列表</a>
           </li>
-          <li class="">
-            <a href="./stuff.php"><span class="glyphicon glyphicon-user"></span> 员工列表</a>
-          </li>          
           <li>
-            <a href="./item.php"><span class="glyphicon glyphicon-user"></span> 事件列表</a>
+            <a href="./stuff.php"><span class="glyphicon glyphicon-user"></span> 员工列表</a>
           </li>
+          <li>
+            <a href="./item.php"><span class="glyphicon glyphicon-th-list"></span> 事件列表</a>
+          </li>
+          <li>
+            <a href="./set.php"><span class="glyphicon glyphicon-cog"></span> 网站设置</a>
+          </li>      
           <li><a href="./login.php?logout"><span class="glyphicon glyphicon-log-out"></span> 退出登陆</a></li>
         </ul>
       </div><!-- /.navbar-collapse -->
