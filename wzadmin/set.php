@@ -9,6 +9,10 @@ include './head.php';
 if($islogin==1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
 
 if(isset($_POST['group'])) {
+
+	if(preg_match("/^\d{6,}$/", $_POST['group'])) {
+		exit("<script language='javascript'>alert('群号格式错误');history.go(-1);</script>");
+	}
 	$rs=$DB->query("UPDATE setting SET `group`='".$_POST['group']."' WHERE 1=1 LIMIT 1");
 	if($rs){$res='设置成功';}
 	else{$res='设置失败';}
