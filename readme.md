@@ -1,8 +1,9 @@
-配置方法
+﻿配置方法
 ---
-1. 将```demo.php```、```CoolQ.config.php```和```CoolQ.class.php```一起放在上一步设定的接口目录下
-2. 打开```CoolQ.config.php```，根据 插件设置 进行修改配置
- 配置参数说明：
+
+1.配置config.php, 填写数据库信息
+2.导入install.sql
+
 
  |  参数 |  默认值  |  说明  |
  | --- | --- | --- |
