@@ -161,7 +161,8 @@ echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> '
 ?>
           </tbody>
         </table>
-<input type="submit" name="Submit" value="删除选中">
+<input id="select-all" type="checkbox">全选
+<input type="submit" name="Submit" value="删除选中" class="btn btn btn-danger btn-sm">
 </form>
       </div>
 <?php
@@ -202,8 +203,17 @@ echo'</ul>';
     var queryStr = "<?php echo $queryStr ?>";
     $('#export').click(function() {
       window.location.href="export.php" + queryStr;
-      // console.log("export.php" + queryStr)
+
     })
+
+   $("#select-all").click(function() {
+        $('input[name="checkbox[]"]').prop("checked",this.checked); 
+    });
+    var $subBox = $("input[name='checkbox[]']");
+    $subBox.click(function(){
+        $("#select-all").prop("checked",$subBox.length == $("input[name='checkbox[]']:checked").length ? true : false);
+    });
+
     
   </script>
   </body>
