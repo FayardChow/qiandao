@@ -3,7 +3,7 @@
 //ini_set('display_errors', '1');
 error_reporting(E_ALL ^ E_DEPRECATED);
 date_default_timezone_set("Asia/Shanghai");
-include 'CoolQ.config.php';
+include 'config.php';
 
 
 
@@ -11,11 +11,11 @@ $array = $CQ->receive(); //接收插件推送的数据
 if(!$array) exit; //没传入数据，终止运行
 
 //连接数据库
-$con = mysql_connect("localhost","root","root");
+$con = mysql_connect($dbconfig['host'],$dbconfig['user'],$dbconfig['pwd']);
 if (!$con){
   die('无法连接数据库: ' . mysql_error());
 }
-mysql_select_db("qiandao", $con);
+mysql_select_db($dbconfig['dbname'], $con);
 
 
 
@@ -88,22 +88,51 @@ switch($array['type']) {
             }        
 
         }else {
-            $re = mysql_query("INSERT INTO log (qq, item, add_time) VALUES ('$qq', '$msg', '$date')");
+
+            $sql = mysql_query("SELECT name FROM item");
+
+            $str = "";  //以"|"分隔的事件名称
+           
+            while ($row = mysql_fetch_array($sql)) {
+                $str .= $row['name']."|";
+               
+            }
+
+            $str = substr($str, 0, strlen($str)-1);  //去掉最后一个字符
+            
+
+            $num = preg_match_all("/$str/", $msg, $matches);  //提取所有与数据库事件匹配的
+            if($num == 0) {
+                $CQ->sendGroupMsg($group,'请正确输入您的信息: '.$str);
+                exit();
+            }
+
+            $r = mysql_query("SELECT name FROM stuff WHERE qq='$qq' LIMIT 1"); //查询qq对应姓名
+
+            if($a = mysql_fetch_array($r)) {
+                $name = $a['name'];
+            } else {
+                $name = "无名氏";
+            }
+
+            $str1 = "";   //以"+"分隔的事件名称
+
+            foreach ($matches[0] as $m) {
+                 $str1 .= $m."+";
+            }      
+  
+            $str1 = substr($str1, 0, strlen($str1)-1);  //去掉最后一个字符
+
+
+            //插入签到记录
+            $re = mysql_query("INSERT INTO log (qq, name, item, add_time) VALUES ('$qq', '$name', '$str1', '$date')");
             
             if($re) {
-                $CQ->sendGroupMsg($group,$CQ->cqAt($qq));
-                $CQ->sendGroupMsg($group, "已经记录 " . $msg . " " .date("H:i:s"));            
+                $CQ->sendGroupMsg($group, $CQ->cqAt($qq)." $name 已经记录 " . $str1 . " " .date("H:i:s"));            
             }else {
                 $CQ->sendGroupMsg($group,'数据库插入失败');
             }            
         }
-
-
-
-        // $CQ->sendGroupMsg($group,'你是我的闺蜜Siri吗');
-        // $CQ->sendGroupMsg($group,$CQ->cqAt($array['qq']));
-        //$CQ->sendGroupMsg($group,"本次消息结构体：\r\n".print_r($array,true));
-        //$CQ->sendGroupMsg($group,"本次消息(仅文本)：\r\n$msg");
 
         break;
 

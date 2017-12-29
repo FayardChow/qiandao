@@ -3,8 +3,15 @@ $mod='blank';
 include("../includes/common.php");
 $title='后台首页';
 include './head.php';
+
 if($islogin==1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
 ?>
+<style>
+  form input{
+    margin-right: 10px;
+    margin-left: 4px;
+  }
+</style>
   <nav class="navbar navbar-fixed-top navbar-default">
     <div class="container">
       <div class="navbar-header">
@@ -19,10 +26,13 @@ if($islogin==1){}else exit("<script language='javascript'>window.location.href='
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
           <li class="active">
-            <a href="./"><span class="glyphicon glyphicon-user"></span> 数据列表</a>
+            <a href="./"><span class="glyphicon glyphicon-user"></span> 记录列表</a>
           </li>
+          <li class="">
+            <a href="./stuff.php"><span class="glyphicon glyphicon-user"></span> 员工列表</a>
+          </li>          
           <li>
-            <a href="./set.php"><span class="glyphicon glyphicon-user"></span> 网站设置</a>
+            <a href="./item.php"><span class="glyphicon glyphicon-user"></span> 事件列表</a>
           </li>
           <li><a href="./login.php?logout"><span class="glyphicon glyphicon-log-out"></span> 退出登陆</a></li>
         </ul>
@@ -34,47 +44,11 @@ if($islogin==1){}else exit("<script language='javascript'>window.location.href='
 <?php
 $my=isset($_GET['my'])?$_GET['my']:null;
 
-// if($my=='add')
-// {
-// 	if($url = $_GET['url']){
-// 		$url = parse_url($url);
-// 		$url = $url['host'];
-// 	}
-// echo '<div class="panel panel-primary">
-// <div class="panel-heading"><h3 class="panel-title">添加记录</h3></div>';
-// echo '<div class="panel-body">';
-// echo '<form action="./index.php?my=add_submit" method="POST">
-// <div class="form-group">
-// <label>域名:</label>(不要加http://和/)<br>
-// <input type="text" class="form-control" name="domain" value="'.@$url.'" required>
-// </div>
-// <div class="form-group">
-// <label>类型:</label><br>
-// <select class="form-control" name="type"><option value="2">黑名单</option><option value="1">白名单</option></select>
-// </div>
-// <input type="submit" class="btn btn-primary btn-block" value="确定添加"></form>';
-// echo '<br/><a href="./index.php">>>返回记录列表</a>';
-// echo '</div></div>';
-// }
-// elseif($my=='add_submit')
-// {
-// $domain=$_POST['domain'];
-// $type=$_POST['type'];
-// if($domain==NULL or $type==NULL){
-//   showmsg('保存错误,请确保每项都不为空!',3);
-// } else {
-//   $sql="insert into `frame_list` (`domain`,`date`,`type`) values ('".$domain."','".$date."','".$type."')";
-//   if($DB->query($sql)){
-//   	showmsg('添加'.($type==2?'黑名单':'白名单').'成功！<br/><br/><a href="./index.php">>>返回列表</a>',1);
-//   }else
-//   	showmsg('添加'.($type==2?'黑名单':'白名单').'失败！'.$DB->error(),4);
-//   }
-// }
 
 //单个删除
 if($my=='del'){
 $id=intval($_GET['id']);
-$sql=$DB->query("DELETE FROM frame_list WHERE id='$id'");
+$sql=$DB->query("DELETE FROM log WHERE Id='$id'");
 if($sql){$res='删除成功！';}
   else{$res='删除失败！';}
   exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
@@ -85,7 +59,7 @@ elseif($my=='del2'){
 $checkbox=$_POST['checkbox'];
 $i=0;
 foreach($checkbox as $id){
-	$DB->query("DELETE FROM frame_list WHERE id='$id'");
+	$DB->query("DELETE FROM log WHERE Id='$id'");
 	$i++;
 }
 exit("<script language='javascript'>alert('成功删除{$i}条记录');history.go(-1);</script>");
@@ -93,7 +67,7 @@ exit("<script language='javascript'>alert('成功删除{$i}条记录');history.g
 
 //清空所有
 elseif($my=='qk'){
-  $sql=$DB->query("DELETE FROM frame_list");
+  $sql=$DB->query("DELETE FROM log");
   if($sql){$res='删除成功！';}
   else{$res='删除失败！';}
   exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
@@ -108,22 +82,56 @@ else{
 
 if(isset($_GET['kw'])) {
 	if($_GET['type']==1) {
-		$sql=" `domain`='{$_GET['kw']}'";
-		$numrows=$DB->count("SELECT count(*) from frame_list WHERE{$sql}");
+    $keyword = trim($_GET['kw']); 
+
+
+    if(preg_match("/\d+/", $keyword)) {
+      $sql=" `qq` LIKE '%$keyword%'";
+    } else {
+      $sql=" `name` LIKE '%$keyword%'";
+    }
+
+
+    //时间筛选
+    if($_GET['start-date'] != "") {
+      if($_GET['end-date'] == "") {
+
+        $end_date = date("Y-m-d H:i:s");   //如果没有指定结束日期，默认结束日期为此刻
+
+      } else {
+        if(strtotime($_GET['end-date']) - strtotime($_GET['start-date']) < 0) {
+          exit("<script language='javascript'>alert('结束时间要比开始时间晚');history.go(-1);</script>");
+        } else {
+          $end_date = $_GET['end-date'] . " 23:59:59";  //结束日期默认为当日23:59:59
+         
+        }
+      }
+       $sql .= " AND UNIX_TIMESTAMP(add_time) >= UNIX_TIMESTAMP('{$_GET['start-date']}') AND UNIX_TIMESTAMP(add_time) <= UNIX_TIMESTAMP('$end_date')";
+
+    }
+
+    //超时筛选
+
+    if(isset($_GET['over']) && $_GET['over'] == "on") {
+      $sql .= " AND over_time";
+    }
+		
+
+		$numrows=$DB->count("SELECT count(*) from log WHERE{$sql}");
 		$con='包含 '.$_GET['kw'].' 的共有 <b>'.$numrows.'</b> 个记录';
 	}
 }else{
-	$numrows=$DB->count("SELECT count(*) from frame_list WHERE 1");
+	$numrows=$DB->count("SELECT count(*) from log WHERE 1");
 	$sql=" 1";
-	$con='系统共有 <b id="data-num">'.$numrows.'</b> 条账号数据&nbsp;';
+	$con='系统共有 <b id="data-num">'.$numrows.'</b> 条记录&nbsp;';
 }
-$con.='<a href="./export.php" class="btn btn-primary btn-sm">导出列表</a>&nbsp;&nbsp;<a href="./index.php?my=qk" class="btn btn btn-danger btn-sm" onclick="return confirm(\'你确实要删除所有记录吗？\');">清空所有</a>&nbsp;&nbsp;<button id="auto-update" type="button" class="btn btn-primary" data-toggle="button" aria-pressed="false" autocomplete="off" data-complete-text="停止更新">自动更新</button>';
+$con.='<a href="./export.php" class="btn btn-primary btn-sm">导出列表</a>&nbsp;&nbsp;<a href="./index.php?my=qk" class="btn btn btn-danger btn-sm" onclick="return confirm(\'你确实要删除所有记录吗？\');">清空所有</a>&nbsp;&nbsp;<form style="margin: 20px 0;" class="form-inline" action="./" method="get"><div class="form-group"><label for="keyword">关键词</label><input type="text" class="form-control" placeholder="姓名或QQ号" id="keyword" name="kw"><label for="start-date">开始日期</label><input  class="form-control" type="date" id="start-date" name="start-date"/><label for="end-date">结束日期</label><input type="date"  class="form-control" id="end-date" name="end-date"/><input type="text" class="form-control" value="1" name="type" style="display: none;"></div><div class="checkbox"><label><input type="checkbox" name="over">超时</label></div><button type="submit" class="btn btn-primary">搜索</button></form>';
 echo $con;
 ?>
       <div class="table-responsive">
 	  <form name="form1" method="post" action="index.php?my=del2">
         <table class="table table-striped">
-          <thead><tr><th>账号</th><th>密码</th><th>时间</th><th>操作</th></tr></thead>
+          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>事件</th><th>登记时间</th><th>返回时间</th><th>超时</th><th>操作</th></tr></thead>
           <tbody>
 <?php
 $pagesize=30;
@@ -140,10 +148,10 @@ $page=1;
 }
 $offset=$pagesize*($page - 1);
 
-$rs=$DB->query("SELECT * FROM frame_list WHERE{$sql} order by id desc limit $offset,$pagesize");
+$rs=$DB->query("SELECT * FROM log WHERE{$sql} order by add_time desc limit $offset,$pagesize");
 while($res = $DB->fetch($rs))
 {
-echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['id'].'"> '.htmlspecialchars($res['user']).'</td><td>'.($res['pass']).'</td><td>'.$res['date'].'</td><td><a href="./index.php?my=del&id='.$res['id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a></td></tr>';
+echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> '.htmlspecialchars($res['user']).'</td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res['item'].'</td><td>'.$res['add_time'].'</td><td>'.$res['back_time'].'</td><td>'.$res['over_time'].'</td><td><a href="./index.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a></td></tr>';
 }
 ?>
           </tbody>

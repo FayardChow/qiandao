@@ -11,10 +11,9 @@ header( "Expires:   0 ");
 header( "Cache-Control:   must-revalidate,   post-check=0,   pre-check=0 "); 
 header( "Pragma:   public "); 
 
-$rs=$DB->query("SELECT * FROM frame_list");
-while($res = $DB->fetch($rs))
-{
-echo $res['user'].'----'.$res['pass'].'----'.$res['date'];
-echo "\r\n";
+$rs=$DB->query("SELECT * FROM log");
+while($res = $DB->fetch($rs)) {
+	echo $res['qq']."\t".$res['name']."\t".$res['item']."\t".$res['add_time']."\t".$res['back_time']."\t".$res['over_time'];
+	echo "\r\n";
 }
 ?>
