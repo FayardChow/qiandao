@@ -208,7 +208,7 @@ echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> '
 ?>
           </tbody>
         </table>
-<input type="submit" name="Submit" value="删除选中">
+<input type="submit" name="Submit" value="删除选中" class="btn btn btn-danger btn-sm">
 </form>
       </div>
 <?php
