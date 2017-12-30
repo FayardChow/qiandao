@@ -53,7 +53,7 @@ while ($row = mysql_fetch_array($re)) {
     $min = round((time() - strtotime($row['add_time']))/60);  //时间相差分钟数
     $over_time = $min - $all_min;  //超时时间
   
-  	if($over_time >= -5 && $over_time <= 0) {
+  	if($over_time >= -3 && $over_time <= 0) {
   		$CQ->sendGroupMsg($group, $CQ->cqAt($row['qq'])." ".$row['name'].$row['item']."还有".abs($over_time)."分钟, 请尽快签回");
   	}
 
