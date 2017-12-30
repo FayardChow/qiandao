@@ -81,8 +81,7 @@ switch($array['type']) {
                         $name = "无名氏";
                     }
 
-                    $CQ->sendGroupMsg($group,$CQ->cqAt($qq));
-                    $CQ->sendGroupMsg($group, $name." ".$row['item']." 已经记录签回,用时：".$min."分钟".$over_msg);            
+                    $CQ->sendGroupMsg($group, $CQ->cqAt($qq)." ".$name." ".$row['item']." 已经记录签回,用时：".$min."分钟".$over_msg);            
             }else {
                 $CQ->sendGroupMsg($group,'数据库插入失败');
             }        
@@ -103,7 +102,7 @@ switch($array['type']) {
 
             $num = preg_match_all("/$str/", $msg, $matches);  //提取所有与数据库事件匹配的
             if($num == 0) {
-                $CQ->sendGroupMsg($group,'请正确输入您的信息: '.$str);
+                //$CQ->sendGroupMsg($group,'请正确输入您的信息: '.$str);
                 exit();
             }
 
