@@ -1,7 +1,7 @@
 <?php
 $mod='blank';
 include("../includes/common.php");
-$title='后台首页';
+$title='用时列表';
 include './head.php';
 
 if($islogin==1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
@@ -25,10 +25,10 @@ if($islogin==1){}else exit("<script language='javascript'>window.location.href='
       </div><!-- /.navbar-header -->
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
-          <li class="active">
+          <li>
             <a href="./"><span class="glyphicon glyphicon-align-justify"></span> 记录列表</a>
           </li>
-          <li>
+          <li class="active" >
             <a href="./time.php"><span class="glyphicon glyphicon-user"></span> 用时列表</a>
           </li>          
           <li>
@@ -54,7 +54,7 @@ $my=isset($_GET['my'])?$_GET['my']:null;
 //单个删除
 if($my=='del'){
 $id=intval($_GET['id']);
-$sql=$DB->query("DELETE FROM log WHERE Id='$id'");
+$sql=$DB->query("DELETE FROM time WHERE Id='$id'");
 if($sql){$res='删除成功！';}
   else{$res='删除失败！';}
   exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
@@ -65,7 +65,7 @@ elseif($my=='del2'){
 $checkbox=$_POST['checkbox'];
 $i=0;
 foreach($checkbox as $id){
-	$DB->query("DELETE FROM log WHERE Id='$id'");
+	$DB->query("DELETE FROM time WHERE Id='$id'");
 	$i++;
 }
 exit("<script language='javascript'>alert('成功删除{$i}条记录');history.go(-1);</script>");
@@ -73,7 +73,7 @@ exit("<script language='javascript'>alert('成功删除{$i}条记录');history.g
 
 //清空所有
 elseif($my=='qk'){
-  $sql=$DB->query("DELETE FROM log");
+  $sql=$DB->query("DELETE FROM time");
   if($sql){$res='删除成功！';}
   else{$res='删除失败！';}
   exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
@@ -112,7 +112,7 @@ if(isset($_GET['kw'])) {
          
         }
       }
-       $sql .= " AND UNIX_TIMESTAMP(add_time) >= UNIX_TIMESTAMP('{$_GET['start-date']}') AND UNIX_TIMESTAMP(add_time) <= UNIX_TIMESTAMP('$end_date')";
+       $sql .= " AND UNIX_TIMESTAMP(`date`) >= UNIX_TIMESTAMP('{$_GET['start-date']}') AND UNIX_TIMESTAMP(`date`) <= UNIX_TIMESTAMP('$end_date')";
 
     }
 
@@ -123,23 +123,23 @@ if(isset($_GET['kw'])) {
     }
 		
 
-		$numrows=$DB->count("SELECT count(*) from log WHERE{$sql}");
+		$numrows=$DB->count("SELECT count(*) from time WHERE{$sql}");
 		$con='包含 '.$_GET['kw'].' 的共有 <b>'.$numrows.'</b> 个记录';
 	}
 
   $queryStr = $_SERVER["QUERY_STRING"];
 }else{
-	$numrows=$DB->count("SELECT count(*) from log WHERE 1");
+	$numrows=$DB->count("SELECT count(*) from time WHERE 1");
 	$sql=" 1";
 	$con='系统共有 <b id="data-num">'.$numrows.'</b> 条记录&nbsp;';
 }
-$con.='<a href="#" id="export"class="btn btn-primary btn-sm">导出列表</a>&nbsp;&nbsp;<a href="./index.php?my=qk" class="btn btn btn-danger btn-sm" onclick="return confirm(\'你确实要删除所有记录吗？\');">清空所有</a>&nbsp;&nbsp;<form style="margin: 20px 0;" class="form-inline" action="./" method="get"><div class="form-group"><label for="keyword">关键词</label><input type="text" class="form-control" placeholder="姓名或QQ号" id="keyword" name="kw"><label for="start-date">开始日期</label><input  class="form-control" type="date" id="start-date" name="start-date"/><label for="end-date">结束日期</label><input type="date"  class="form-control" id="end-date" name="end-date"/><input type="text" class="form-control" value="1" name="type" style="display: none;"></div><div class="checkbox"><label><input type="checkbox" name="over">超时</label></div><button type="submit" class="btn btn-primary">搜索</button></form>';
+$con.='<a href="#" id="export"class="btn btn-primary btn-sm">导出列表</a>&nbsp;&nbsp;<a href="./index.php?my=qk" class="btn btn btn-danger btn-sm" onclick="return confirm(\'你确实要删除所有记录吗？\');">清空所有</a>&nbsp;&nbsp;<form style="margin: 20px 0;" class="form-inline" action="./time.php" method="get"><div class="form-group"><label for="keyword">关键词</label><input type="text" class="form-control" placeholder="姓名或QQ号" id="keyword" name="kw"><label for="start-date">开始日期</label><input  class="form-control" type="date" id="start-date" name="start-date"/><label for="end-date">结束日期</label><input type="date"  class="form-control" id="end-date" name="end-date"/><input type="text" class="form-control" value="1" name="type" style="display: none;"></div><div class="checkbox"><label><input type="checkbox" name="over">超时</label></div><button type="submit" class="btn btn-primary">搜索</button></form>';
 echo $con;
 ?>
       <div class="table-responsive">
-	  <form name="form1" method="post" action="index.php?my=del2">
+	  <form name="form1" method="post" action="time.php?my=del2">
         <table class="table table-striped">
-          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>事件</th><th>登记时间</th><th>返回时间</th><th>用时</th><th>超时</th><th>操作</th></tr></thead>
+          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>用时</th><th>超时</th><th>日期</th><th>操作</th></tr></thead>
           <tbody>
 <?php
 $pagesize=30;
@@ -156,10 +156,10 @@ $page=1;
 }
 $offset=$pagesize*($page - 1);
 
-$rs=$DB->query("SELECT * FROM log WHERE{$sql} order by add_time desc limit $offset,$pagesize");
+$rs=$DB->query("SELECT * FROM time WHERE{$sql} order by `date` desc limit $offset,$pagesize");
 while($res = $DB->fetch($rs))
 {
-echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> </td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res['item'].'</td><td>'.$res['add_time'].'</td><td>'.$res['back_time'].'</td><td>'.$res['use_time'].'</td><td>'.$res['over_time'].'</td><td><a href="./index.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a></td></tr>';
+echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"></td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res['use_time'].'</td><td>'.$res['over_time'].'</td><td>'.$res['date'].'</td><td><a href="./time.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a></td></tr>';
 }
 ?>
           </tbody>
@@ -205,7 +205,7 @@ echo'</ul>';
   <script type="text/javascript">
     var queryStr = "<?php echo $queryStr ?>";
     $('#export').click(function() {
-      window.location.href="export.php?" + queryStr + "&table=log";
+      window.location.href="export.php?" + queryStr + "&table=time";
 
     })
 

@@ -24,21 +24,24 @@ if($islogin==1){}else exit("<script language='javascript'>window.location.href='
         <a class="navbar-brand" href="./">后台管理</a>
       </div><!-- /.navbar-header -->
       <div id="navbar" class="collapse navbar-collapse">
-	    <ul class="nav navbar-nav navbar-right">
-	      <li>
-	        <a href="./"><span class="glyphicon glyphicon-align-justify"></span> 记录列表</a>
-	      </li>
-	      <li class="active">
-	        <a href="./stuff.php"><span class="glyphicon glyphicon-user"></span> 员工列表</a>
-	      </li>
-	      <li>
-	        <a href="./item.php"><span class="glyphicon glyphicon-th-list"></span> 事件列表</a>
-	      </li>
-	      <li>
-	        <a href="./set.php"><span class="glyphicon glyphicon-cog"></span> 网站设置</a>
-	      </li>      
-	      <li><a href="./login.php?logout"><span class="glyphicon glyphicon-log-out"></span> 退出登陆</a></li>
-	    </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li>
+            <a href="./"><span class="glyphicon glyphicon-align-justify"></span> 记录列表</a>
+          </li>
+          <li>
+            <a href="./time.php"><span class="glyphicon glyphicon-user"></span> 用时列表</a>
+          </li>          
+          <li class="active">
+            <a href="./stuff.php"><span class="glyphicon glyphicon-user"></span> 员工列表</a>
+          </li>
+          <li>
+            <a href="./item.php"><span class="glyphicon glyphicon-th-list"></span> 事件列表</a>
+          </li>
+          <li>
+            <a href="./set.php"><span class="glyphicon glyphicon-cog"></span> 网站设置</a>
+          </li>      
+          <li><a href="./login.php?logout"><span class="glyphicon glyphicon-log-out"></span> 退出登陆</a></li>
+        </ul>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container -->
   </nav><!-- /.navbar -->
@@ -102,6 +105,7 @@ elseif($my == "edit") {
 			$sql = $DB->query("UPDATE stuff SET qq='$qq', name='$name' WHERE Id='$id'");  //更新会员资料
 			if($sql) {
 				$DB->query("UPDATE log SET qq='$qq', name='$name' WHERE qq='{$row['qq']}'");  //更新现有数据记录
+				$DB->query("UPDATE time SET qq='$qq', name='$name' WHERE qq='{$row['qq']}'"); //更新现有用时记录
 				exit("<script language='javascript'>alert('更新成功');history.go(-1);</script>");				
 			}
 
@@ -183,7 +187,7 @@ echo $con;
       <div class="table-responsive">
 	  <form name="form1" method="post" action="stuff.php?my=del2">
         <table class="table table-striped">
-          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>操作</th></tr></thead>
+          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>今日用时</th><th>操作</th></tr></thead>
           <tbody>
 <?php
 $pagesize=30;
@@ -203,7 +207,9 @@ $offset=$pagesize*($page - 1);
 $rs=$DB->query("SELECT * FROM stuff WHERE{$sql} order by id asc limit $offset,$pagesize");
 while($res = $DB->fetch($rs))
 {
-echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> '.htmlspecialchars($res['user']).'</td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td><a href="./stuff.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a>&nbsp;&nbsp;<a href="#" class="btn btn-xs btn-success btn-edit" data-toggle="modal" data-target="#myModal" id="'.$res['Id'].'">编辑</a></td></tr>';
+	$rs_t = $DB->query("SELECT `use_time` FROM time WHERE qq='{$res['qq']}' AND `date`=current_date"); //查询当日用时记录
+	$res_t = $DB->fetch($rs_t);
+	echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> '.htmlspecialchars($res['user']).'</td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res_t['use_time'].'</td><td><a href="./stuff.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a>&nbsp;&nbsp;<a href="#" class="btn btn-xs btn-success btn-edit" data-toggle="modal" data-target="#myModal" id="'.$res['Id'].'">编辑</a></td></tr>';
 }
 ?>
           </tbody>

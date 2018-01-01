@@ -39,40 +39,33 @@ switch($array['type']) {
         $date = date("Y-m-d H:i:s");
 
         if(strpos($msg, '回') !== FALSE) {
-            $re = mysql_query("UPDATE log SET back_time='$date' WHERE qq='$qq' AND ISNULL(back_time)");
-            if($re) {
-                $re1 = mysql_query("SELECT * FROM log WHERE qq='$qq' ORDER BY add_time DESC LIMIT 1");
-                $row = mysql_fetch_array($re1);
 
-                $min = round((strtotime($row['back_time']) - strtotime($row['add_time']))/60);  //时间相差分钟数
-                
-                if(strpos($row['item'], '+') !== FALSE) {
-                    $item = explode("+", $row['item']);
-                    $re2 = mysql_query("SELECT * FROM item");  //所有事件
+            $re = mysql_query("SELECT * FROM log WHERE qq='$qq' AND ISNULL(back_time) ORDER BY add_time asc");
+            if(mysql_num_rows($re)) {
 
-                    $all_min = 0;  //设定的超时时间
-                    while ( $arr = mysql_fetch_array($re2)) {
-                        foreach ($item as $i) {
-                            if($arr['name'] == $i) {
-                                $all_min += $arr['time'];
+                while ($row = mysql_fetch_array($re)) {
+                    mysql_query("UPDATE log SET back_time='$date' WHERE Id={$row['Id']}");
+                    $min = round((strtotime($date) - strtotime($row['add_time']))/60);  //时间相差分钟数
+                    
+                    if(strpos($row['item'], '+') !== FALSE) {
+                        $item = explode("+", $row['item']);
+                        $re2 = mysql_query("SELECT * FROM item");  //所有事件
+
+                        $all_min = 0;  //设定的超时时间
+                        while ( $arr = mysql_fetch_array($re2)) {
+                            foreach ($item as $i) {
+                                if($arr['name'] == $i) {
+                                    $all_min += $arr['time'];
+                                }
                             }
                         }
+                    } else {
+                        $item = $row['item'];
+                        $re2 = mysql_query("SELECT * FROM item WHERE name='$item'");  //查找对应事件
+                        $arr = mysql_fetch_array($re2);
+                        $all_min = $arr['time'];
                     }
-                } else {
-                    $item = $row['item'];
-                    $re2 = mysql_query("SELECT * FROM item WHERE name='$item'");  //查找对应事件
-                    $arr = mysql_fetch_array($re2);
-                    $all_min = $arr['time'];
-                }
-
-                $over_time = $min - $all_min;  //超时时间
-                if($over_time > 0) {  //超时回复信息
-                    $over_msg = ",超时：".$over_time."分钟";
-                    $id = $row['Id'];
-                    mysql_query("UPDATE log SET over_time='$over_time' WHERE id='$id'");  //更新超时记录
-                }else {
-                    $over_msg = "";
-                }
+                    
 
                     $re_n = mysql_query("SELECT name FROM stuff WHERE qq='$qq' LIMIT 1");  //查询员工名称
                     if($arr = mysql_fetch_array($re_n)) {
@@ -81,9 +74,43 @@ switch($array['type']) {
                         $name = "无名氏";
                     }
 
+                    //更新日用时记录
+                    $re_t = mysql_query("SELECT * FROM time WHERE qq='$qq' AND `date`=current_date LIMIT 1"); //查询当日用时记录是否已存在，如果不存在插入一个
+                    $re_t1 = mysql_query("SELECT time FROM setting LIMIT 1");//查询规定每日用时
+
+
+
+                    //如果查询到规定用时，则按规定用时,否则默认120分钟
+                    $set_time = ($r2 = mysql_fetch_array($re_t1)) ? $r2['time'] : 120;  
+                    if($r = mysql_fetch_array($re_t)) {
+                        //当日超时时间
+                        $over_time = ($r['use_time'] + $min) > $set_time ? ($r['use_time'] + $min) - $set_time : 0; 
+                        
+                        mysql_query("UPDATE time SET use_time=use_time+'$min', over_time='$over_time' WHERE qq='$qq' AND `date`=current_date");
+
+                    } else {
+                        $over_time = $min > $set_time ? $min - $set_time : 0;
+                        mysql_query("INSERT INTO time (name, qq, use_time, `date`, over_time) VALUES('$name', '$qq', '$min', current_date, '$over_time')");
+                    }
+
+
+
+                    $over_time = $min - $all_min;  //超时时间
+                    $id = $row['Id'];
+                    mysql_query("UPDATE log SET use_time='$min' WHERE Id='$id'");  //更新用时记录
+                    if($over_time > 0) {  //超时回复信息
+                        $over_msg = ",超时：".$over_time."分钟";
+                    }else {
+                        $over_msg = "";
+                        $over_time = 0;
+                    }
+
+                    mysql_query("UPDATE log SET over_time='$over_time' WHERE Id='$id'");  //更新超时记录
+
                     $CQ->sendGroupMsg($group, $CQ->cqAt($qq)." ".$name." ".$row['item']." 已经记录签回,用时：".$min."分钟".$over_msg);            
+                }    
             }else {
-                $CQ->sendGroupMsg($group,'数据库插入失败');
+                $CQ->sendGroupMsg($group,'没有未签回记录');
             }        
 
         }else {

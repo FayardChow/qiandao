@@ -14,8 +14,6 @@ $conf=array(
 	'admin_pwd' => 'adminwz', //管理员密码
 );
 
-
-
 /**
  * 接口配置文件
  */
