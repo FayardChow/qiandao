@@ -3,7 +3,7 @@
  * 导出
 **/
 include("../includes/common.php");
-if($islogin==1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
+if($_SESSION['islogin'] == 1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
 Header( "Content-type:   application/octet-stream "); 
 Header( "Accept-Ranges:   bytes "); 
 header( "Content-Disposition:   attachment;   filename=export.txt "); 

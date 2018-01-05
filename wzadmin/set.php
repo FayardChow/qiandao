@@ -6,7 +6,7 @@ $mod='blank';
 include("../includes/common.php");
 $title='网站设置';
 include './head.php';
-if($islogin==1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
+if($_SESSION['islogin']==1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
 
 if(isset($_POST['group'])) {
 

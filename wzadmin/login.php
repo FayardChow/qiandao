@@ -7,23 +7,40 @@ include("../includes/common.php");
 if(isset($_POST['user']) && isset($_POST['pass'])){
 	$user=daddslashes($_POST['user']);
 	$pass=daddslashes($_POST['pass']);
-	if($user==$conf['admin_user'] && $pass==$conf['admin_pwd']) {
-		$session=md5($user.$pass.$password_hash);
-		$token=authcode("{$user}\t{$session}", 'ENCODE', SYS_KEY);
-		setcookie("admin_token", $token, time() + 604800);
-		@header('Content-Type: text/html; charset=UTF-8');
-		exit("<script language='javascript'>alert('登陆后台管理成功！');window.location.href='./';</script>");
-	}elseif ($pass != $conf['admin_pwd']) {
-		@header('Content-Type: text/html; charset=UTF-8');
-		exit("<script language='javascript'>alert('用户名或密码不正确！');history.go(-1);</script>");
-	}
-}elseif(isset($_GET['logout'])){
-	setcookie("admin_token", "", time() - 604800);
-	@header('Content-Type: text/html; charset=UTF-8');
-	exit("<script language='javascript'>alert('您已成功注销本次登陆！');window.location.href='./login.php';</script>");
-}elseif($islogin==1){
-	exit("<script language='javascript'>alert('您已登陆！');window.location.href='./';</script>");
+  $sql = $DB->query("SELECT name,pass,company FROM user WHERE name='$user' LIMIT 1");
+
+  if($row = $DB->fetch($sql)) {
+    if($pass == $row['pass']) {
+      //保存公司名于session
+      if($row['company'] == "") {
+        exit("<script language='javascript'>alert('公司名称未设置！');history.go(-1);</script>");
+      }
+      $_SESSION['company'] = $row['company'];
+      $_SESSION['islogin'] = 1;
+      // $session=md5($user.$pass.$password_hash);
+      // $token=authcode("{$user}\t{$session}", 'ENCODE', SYS_KEY);
+      // setcookie("admin_token", $token, time() + 604800);
+      // @header('Content-Type: text/html; charset=UTF-8');
+      exit("<script language='javascript'>alert('登陆后台管理成功！');window.location.href='./';</script>");
+
+    }else {
+      @header('Content-Type: text/html; charset=UTF-8');
+      exit("<script language='javascript'>alert('用户名或密码不正确！');history.go(-1);</script>");
+    }
+  }else{
+      exit("<script language='javascript'>alert('用户名或密码不正确！');history.go(-1);</script>");
+  }
+
 }
+if(isset($_GET['logout'])){
+  // setcookie("admin_token", "", time() - 604800);
+  // @header('Content-Type: text/html; charset=UTF-8');
+  session_unset();
+  exit("<script language='javascript'>alert('您已成功注销本次登陆！');window.location.href='./login.php';</script>");
+}elseif($islogin==1){
+  exit("<script language='javascript'>alert('您已登陆！');window.location.href='./';</script>");
+}    
+
 $title='用户登录';
 include './head.php';
 ?>

@@ -4,7 +4,7 @@ include("../includes/common.php");
 $title='事件列表';
 include './head.php';
 
-if($islogin==1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
+if($_SESSION['islogin']==1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
 ?>
 <style>
   form input{

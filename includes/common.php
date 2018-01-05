@@ -26,4 +26,6 @@ $DB=new DB($dbconfig['host'],$dbconfig['user'],$dbconfig['pwd'],$dbconfig['dbnam
 require (SYSTEM_ROOT."function.php");
 require (SYSTEM_ROOT."txprotect.php");
 require (SYSTEM_ROOT."member.php");
+
+
 ?>
