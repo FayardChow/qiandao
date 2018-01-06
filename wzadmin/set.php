@@ -16,8 +16,15 @@ if(isset($_POST['group'])) {
 	if(!preg_match("/^\d+$/", $_POST['time'])) {
 		exit("<script language='javascript'>alert('时间格式错误');history.go(-1);</script>");
 	}
+	$r = $DB->query("SELECT * FROM setting WHERE company={$_SESSION['company']} LIMIT 1");
 
-	$rs=$DB->query("UPDATE setting SET `group`='".$_POST['group']."', `time`='".$_POST['time']."' WHERE 1=1 LIMIT 1");
+	if($row = $DB->fetch($r)) {
+		$rs=$DB->query("UPDATE setting SET `group`='".$_POST['group']."', `time`='".$_POST['time']."' WHERE company={$_SESSION['company']} LIMIT 1");
+	}else {
+		$rs=$DB->query("INSERT INTO setting (`group`,`time`,company) VALUES ({$_POST['group']}, {$_POST['time']}, {$_SESSION['company']})");
+	}
+
+	
 	if($rs){$res='设置成功';}
 	else{$res='设置失败';}
 	exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
@@ -25,7 +32,7 @@ if(isset($_POST['group'])) {
 
 
 
-$rs=$DB->query("SELECT `group`,`time` FROM setting LIMIT 1");
+$rs=$DB->query("SELECT `group`,`time` FROM setting WHERE company={$_SESSION['company']} LIMIT 1");
 if($rs) {
 	$res = $DB->fetch($rs);
 	$group = $res['group'];  //群号
