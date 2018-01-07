@@ -26,7 +26,7 @@ switch($array['type']) {
         //收到私聊信息
         $qq = $array['qq'];
         $msg = $array['msg'];
-        $CQ->sendPrivateMsg($qq, "请在群里回复");
+        $CQ->sendPrivateMsg($qq, "请在群里回复，如需超时抖动窗口提醒，请添加我好友~");
         break;
 
     case 2:
