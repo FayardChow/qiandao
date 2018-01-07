@@ -66,7 +66,7 @@ if($rs) {
         <a href="./"><span class="glyphicon glyphicon-align-justify"></span> 记录列表</a>
       </li>
       <li>
-        <a href="./time.php"><span class="glyphicon glyphicon-user"></span> 用时列表</a>
+        <a href="./time.php"><span class="glyphicon glyphicon-time"></span> 用时列表</a>
       </li>          
       <li>
         <a href="./stuff.php"><span class="glyphicon glyphicon-user"></span> 员工列表</a>
