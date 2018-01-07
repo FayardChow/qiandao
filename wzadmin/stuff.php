@@ -73,7 +73,7 @@ exit("<script language='javascript'>alert('成功删除{$i}条记录');history.g
 
 //清空所有
 elseif($my=='qk'){
-  $sql=$DB->query("DELETE FROM stuff WHERE company={$_SESSION['company']}");
+  $sql=$DB->query("DELETE FROM stuff WHERE company='".$_SESSION['company']."'");
   if($sql){$res='删除成功！';}
   else{$res='删除失败！';}
   exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
@@ -88,7 +88,7 @@ elseif($my == "edit") {
 	if(!preg_match("/\d{6,}/", $qq)) 
 		exit("<script language='javascript'>alert('QQ格式不正确');history.go(-1);</script>");
 
-	$nrows = $DB->count("SELECT count(*) FROM stuff WHERE (name='$name' OR qq='$qq') AND Id!='$id'");
+	$nrows = $DB->count("SELECT count(*) FROM stuff WHERE (name='$name' OR qq='$qq') AND Id!='$id' AND company='".$_SESSION['company']."'");
 
 	if($nrows) {
 		exit("<script language='javascript'>alert('qq或姓名已占用');history.go(-1);</script>");
@@ -128,14 +128,14 @@ if(isset($_GET['kw'])) {
     $keyword = trim($_GET['kw']); 
 
 
-    if(preg_match("/\d+/", $keyword)) {
+    if(preg_match("/\d{3,}/", $keyword)) {
       $sql=" `qq` LIKE '%$keyword%'";
     } else {
       $sql=" `name` LIKE '%$keyword%'";
     }
 		
 
-	$numrows=$DB->count("SELECT count(*) from stuff WHERE{$sql} AND company={$_SESSION['company']}");
+	$numrows=$DB->count("SELECT count(*) from stuff WHERE{$sql} AND company='".$_SESSION['company']."'");
 	$con='包含 '.$_GET['kw'].' 的共有 <b>'.$numrows.'</b> 个记录';
 
 
@@ -145,17 +145,17 @@ if(isset($_GET['kw'])) {
 		$qq = trim($_GET['qq']);
 		if(preg_match("/\d{6,}/", $qq)) {
 
-			$nrows = $DB->count("SELECT count(*) FROM stuff WHERE name='$name' AND company={$_SESSION['company']} OR qq='$qq' LIMIT 1");  //查询qq或姓名是否已存在
+			$nrows = $DB->count("SELECT count(*) FROM stuff WHERE name='$name' AND company='".$_SESSION['company']."' OR qq='$qq' LIMIT 1");  //查询qq或姓名是否已存在
 			
 			if($nrows) {
 				exit("<script language='javascript'>alert('qq或姓名已占用');history.go(-1);</script>");
 			} else {
 
-				$re = $DB->query("INSERT INTO stuff (qq, name, company) VALUES ('$qq', '$name', {$_SESSION['company']})");
+				$re = $DB->query("INSERT INTO stuff (qq, name, company) VALUES ('$qq', '$name', '".$_SESSION['company']."')");
 
 				if($re) {
-					$DB->query("UPDATE log SET name='$name' WHERE qq='$qq' AND company={$_SESSION['company']}");  //更新原有记录名称
-					$DB->query("UPDATE time SET name='$name' WHERE qq='$qq' AND company={$_SESSION['company']}");  //更新原有记录名称
+					$DB->query("UPDATE log SET name='$name' WHERE qq='$qq' AND company='".$_SESSION['company']."'");  //更新原有记录名称
+					$DB->query("UPDATE time SET name='$name' WHERE qq='$qq' AND company='".$_SESSION['company']."'");  //更新原有记录名称
 					exit("<script language='javascript'>alert('添加成功！');history.go(-1);</script>");
 				} else {
 					exit("<script language='javascript'>alert('添加失败！');history.go(-1);</script>");
@@ -177,8 +177,8 @@ if(isset($_GET['kw'])) {
 
 
 else{
-	$numrows=$DB->count("SELECT count(*) from stuff WHERE company={$_SESSION['company']}");
-
+	$numrows=$DB->count("SELECT count(*) from stuff WHERE company='".$_SESSION['company']."'");
+	$sql="1=1";
 	$con='系统共有 <b id="data-num">'.$numrows.'</b> 条记录&nbsp;';
 }
 $con.='<form style="margin: 20px 0;" class="form-inline" action="'.$_SERVER['PHP_SELF'].'" method="get"><div class="form-group"><label for="keyword">关键词</label><input type="text" class="form-control" placeholder="姓名或QQ号" id="keyword" name="kw"></div><button type="submit" class="btn btn-primary">搜索</button></form>';
@@ -205,7 +205,7 @@ $page=1;
 }
 $offset=$pagesize*($page - 1);
 
-$rs=$DB->query("SELECT * FROM stuff WHERE company={$_SESSION['company']} order by id asc limit $offset,$pagesize");
+$rs=$DB->query("SELECT * FROM stuff WHERE {$sql} AND company='".$_SESSION['company']."' order by id asc limit $offset,$pagesize");
 while($res = $DB->fetch($rs))
 {
 	$rs_t = $DB->query("SELECT `use_time` FROM time WHERE qq='{$res['qq']}' AND `date`=current_date"); //查询当日用时记录

@@ -30,9 +30,10 @@ $re = mysql_query("SELECT * FROM log WHERE isnull(back_time) ORDER BY add_time A
 
 while ($row = mysql_fetch_array($re)) {
 	//$CQ->sendGroupMsg($group, $row['add_time']);
+    $company = $row['company'];
     if(strpos($row['item'], '+') !== FALSE) {
         $item = explode("+", $row['item']);
-        $re2 = mysql_query("SELECT * FROM item");  //所有事件
+        $re2 = mysql_query("SELECT * FROM item WHERE company='$company'");  //所有事件
 
         $all_min = 0;  //设定的超时时间
         while ( $arr = mysql_fetch_array($re2)) {
@@ -44,7 +45,7 @@ while ($row = mysql_fetch_array($re)) {
         }
     } else {
         $item = $row['item'];
-        $re2 = mysql_query("SELECT * FROM item WHERE name='$item'");  //查找对应事件
+        $re2 = mysql_query("SELECT * FROM item WHERE name='$item' AND company='$company'");  //查找对应事件
         $arr = mysql_fetch_array($re2);
         $all_min = $arr['time'];
     }
@@ -54,12 +55,14 @@ while ($row = mysql_fetch_array($re)) {
     $over_time = $min - $all_min;  //超时时间
   
   	if($over_time >= -3 && $over_time <= 0) {
-  		$CQ->sendGroupMsg($group, $CQ->cqAt($row['qq'])." ".$row['name'].$row['item']."还有".abs($over_time)."分钟, 请尽快签回");
+      $CQ->sendPrivateMsg($row['qq'], $CQ->cqShake());
+      $CQ->sendPrivateMsg($row['qq'], "您".$row['item']."还有".abs($over_time)."分钟, 请尽快签回");
   	}
 
 
   	if($over_time == 5) {
-  		$CQ->sendGroupMsg($group, $CQ->cqAt($row['qq']).$row['name'].$row['item']."已超时5分钟,系统将不再提示");
+      $CQ->sendPrivateMsg($row['qq'], $CQ->cqShake());
+      $CQ->sendPrivateMsg($row['qq'], "您已超时5分钟,系统将不再提示");
   	}
     
 

@@ -73,7 +73,7 @@ exit("<script language='javascript'>alert('成功删除{$i}条记录');history.g
 
 //清空所有
 elseif($my=='qk'){
-  $sql=$DB->query("DELETE FROM log WHERE company={$_SESSION['company']}");
+  $sql=$DB->query("DELETE FROM log WHERE company='".$_SESSION['company']."'");
   if($sql){$res='删除成功！';}
   else{$res='删除失败！';}
   exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
@@ -91,7 +91,7 @@ if(isset($_GET['kw'])) {
     $keyword = trim($_GET['kw']); 
 
 
-    if(preg_match("/\d+/", $keyword)) {
+    if(preg_match("/\d{3,}/", $keyword)) {
       $sql=" `qq` LIKE '%$keyword%'";
     } else {
       $sql=" `name` LIKE '%$keyword%'";
@@ -123,14 +123,14 @@ if(isset($_GET['kw'])) {
     }
 		
 
-		$numrows=$DB->count("SELECT count(*) from log WHERE{$sql} AND company={$_SESSION['company']}");
+		$numrows=$DB->count("SELECT count(*) from log WHERE{$sql} AND company='".$_SESSION['company']."'");
 		$con='包含 '.$_GET['kw'].' 的共有 <b>'.$numrows.'</b> 个记录';
 	}
 
   $queryStr = $_SERVER["QUERY_STRING"];
 }else{
-	$numrows=$DB->count("SELECT count(*) from log WHERE company={$_SESSION['company']}");
-
+	$numrows=$DB->count("SELECT count(*) from log WHERE company='".$_SESSION['company']."'");
+  $sql="1=1";
 	$con='系统共有 <b id="data-num">'.$numrows.'</b> 条记录&nbsp;';
 }
 $con.='<a href="#" id="export"class="btn btn-primary btn-sm">导出列表</a>&nbsp;&nbsp;<a href="./index.php?my=qk" class="btn btn btn-danger btn-sm" onclick="return confirm(\'你确实要删除所有记录吗？\');">清空所有</a>&nbsp;&nbsp;<form style="margin: 20px 0;" class="form-inline" action="./" method="get"><div class="form-group"><label for="keyword">关键词</label><input type="text" class="form-control" placeholder="姓名或QQ号" id="keyword" name="kw"><label for="start-date">开始日期</label><input  class="form-control" type="date" id="start-date" name="start-date"/><label for="end-date">结束日期</label><input type="date"  class="form-control" id="end-date" name="end-date"/><input type="text" class="form-control" value="1" name="type" style="display: none;"></div><div class="checkbox"><label><input type="checkbox" name="over">超时</label></div><button type="submit" class="btn btn-primary">搜索</button></form>';
@@ -156,7 +156,7 @@ $page=1;
 }
 $offset=$pagesize*($page - 1);
 
-$rs=$DB->query("SELECT * FROM log WHERE company={$_SESSION['company']} order by add_time desc limit $offset,$pagesize");
+$rs=$DB->query("SELECT * FROM log WHERE {$sql} AND company='".$_SESSION['company']."' order by add_time desc limit $offset,$pagesize");
 while($res = $DB->fetch($rs))
 {
 echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> </td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res['item'].'</td><td>'.$res['add_time'].'</td><td>'.$res['back_time'].'</td><td>'.$res['use_time'].'</td><td>'.$res['over_time'].'</td><td><a href="./index.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a></td></tr>';

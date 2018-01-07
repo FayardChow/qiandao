@@ -73,7 +73,7 @@ exit("<script language='javascript'>alert('成功删除{$i}条记录');history.g
 
 //清空所有
 elseif($my=='qk'){
-  $sql=$DB->query("DELETE FROM item WHERE company={$_SESSION['company']}");
+  $sql=$DB->query("DELETE FROM item WHERE company='".$_SESSION['company']."'");
   if($sql){$res='删除成功！';}
   else{$res='删除失败！';}
   exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
@@ -89,7 +89,7 @@ elseif($my == "edit") {
 	if(!preg_match("/^\d+$/", $time)) 
 		exit("<script language='javascript'>alert('时间格式不正确');history.go(-1);</script>");
 
-	$nrows = $DB->count("SELECT count(*) FROM item WHERE name='$name' AND Id!='$id'");
+	$nrows = $DB->count("SELECT count(*) FROM item WHERE name='$name' AND Id!='$id' AND company='".$_SESSION['company']."'");
 
 	if($nrows) {
 		exit("<script language='javascript'>alert('名称已占用');history.go(-1);</script>");
@@ -123,13 +123,13 @@ elseif(isset($_GET['name'])){
 		$time = trim($_GET['time']);
 		if(preg_match("/\d+/", $time)) {
 
-			$nrows = $DB->count("SELECT count(*) FROM item WHERE name='$name' AND company={$_SESSION['company']} LIMIT 1");  //查询q名称是否已存在
+			$nrows = $DB->count("SELECT count(*) FROM item WHERE name='$name' AND company='".$_SESSION['company']."' LIMIT 1");  //查询q名称是否已存在
 			
 			if($nrows) {
 				exit("<script language='javascript'>alert('名称已占用');history.go(-1);</script>");
 			} else {
 
-				$re = $DB->query("INSERT INTO item (name, time, company) VALUES ('$name', '$time', {$_SESSION['company']})");
+				$re = $DB->query("INSERT INTO item (name, time, company) VALUES ('$name', '$time', '".$_SESSION['company']."')");
 
 				if($re) {
 					exit("<script language='javascript'>alert('添加成功！');history.go(-1);</script>");
@@ -154,7 +154,7 @@ elseif(isset($_GET['name'])){
 //默认列表
 else{
 
-$numrows=$DB->count("SELECT count(*) from item WHERE company={$_SESSION['company']}");
+$numrows=$DB->count("SELECT count(*) from item WHERE company='".$_SESSION['company']."'");
 
 $con='系统共有 <b id="data-num">'.$numrows.'</b> 条记录&nbsp;';
 
@@ -181,7 +181,7 @@ $page=1;
 }
 $offset=$pagesize*($page - 1);
 
-$rs=$DB->query("SELECT * FROM item WHERE company={$_SESSION['company']} order by id asc limit $offset,$pagesize");
+$rs=$DB->query("SELECT * FROM item WHERE company='".$_SESSION['company']."' order by id asc limit $offset,$pagesize");
 while($res = $DB->fetch($rs))
 {
 echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> </td><td>'.$res['name'].'</td><td>'.$res['time'].'</td><td><a href="./item.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a>&nbsp;&nbsp;<a href="#" class="btn btn-xs btn-success btn-edit" data-toggle="modal" data-target="#myModal" id="'.$res['Id'].'">编辑</a></td></tr>';

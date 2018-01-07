@@ -12,7 +12,7 @@ include("../includes/common.php");
 
 
 
-$sql=$DB->query("SELECT * FROM log WHERE company={$_SESSION['company']}");
+$sql=$DB->query("SELECT * FROM log WHERE company='".$_SESSION['company']."'");
 
 
 // $row = $DB->fetch($sql);

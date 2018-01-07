@@ -26,7 +26,7 @@ switch($array['type']) {
         //收到私聊信息
         $qq = $array['qq'];
         $msg = $array['msg'];
-        $CQ->sendPrivateMsg($qq, "收到一条消息:$msg");
+        $CQ->sendPrivateMsg($qq, "请在群里回复");
         break;
 
     case 2:
@@ -38,18 +38,36 @@ switch($array['type']) {
         $msg = str_replace(" ", "", $msg);  //去掉空格
         $date = date("Y-m-d H:i:s");
 
+
+        //查找群对应的公司名称
+        $re_group = mysql_query("SELECT company FROM setting WHERE `group`='$group'");
+        if($r_group = mysql_fetch_array($re_group)) {
+            $company = $r_group['company']; //公司名称
+            if($company == "") {
+                $CQ->sendGroupMsg($group, '群号公司名称未对应，请联系管理员');
+                unset($CQ);//释放连接
+                exit();                
+            }
+        }else {
+            $CQ->sendGroupMsg($group, '群号公司名称未对应，请联系管理员');
+            unset($CQ);//释放连接
+            exit();
+        }
+
         if(strpos($msg, '回') !== FALSE) {
 
-            $re = mysql_query("SELECT * FROM log WHERE qq='$qq' AND ISNULL(back_time) ORDER BY add_time asc");
+            $re = mysql_query("SELECT * FROM log WHERE qq='$qq' AND ISNULL(back_time) AND company='$company' ORDER BY add_time asc");
             if(mysql_num_rows($re)) {
 
                 while ($row = mysql_fetch_array($re)) {
-                    mysql_query("UPDATE log SET back_time='$date' WHERE Id={$row['Id']}");
+                    mysql_query("UPDATE log SET back_time='$date' WHERE Id={$row['Id']} AND company='$company'");
                     $min = round((strtotime($date) - strtotime($row['add_time']))/60);  //时间相差分钟数
                     
                     if(strpos($row['item'], '+') !== FALSE) {
                         $item = explode("+", $row['item']);
-                        $re2 = mysql_query("SELECT * FROM item");  //所有事件
+
+
+                        $re2 = mysql_query("SELECT * FROM item WHERE company='$company'");  //所有事件
 
                         $all_min = 0;  //设定的超时时间
                         while ( $arr = mysql_fetch_array($re2)) {
@@ -61,7 +79,7 @@ switch($array['type']) {
                         }
                     } else {
                         $item = $row['item'];
-                        $re2 = mysql_query("SELECT * FROM item WHERE name='$item'");  //查找对应事件
+                        $re2 = mysql_query("SELECT * FROM item WHERE name='$item' AND company='$company'");  //查找对应事件
                         $arr = mysql_fetch_array($re2);
                         $all_min = $arr['time'];
                     }
@@ -75,8 +93,8 @@ switch($array['type']) {
                     }
 
                     //更新日用时记录
-                    $re_t = mysql_query("SELECT * FROM time WHERE qq='$qq' AND `date`=current_date LIMIT 1"); //查询当日用时记录是否已存在，如果不存在插入一个
-                    $re_t1 = mysql_query("SELECT time FROM setting LIMIT 1");//查询规定每日用时
+                    $re_t = mysql_query("SELECT * FROM time WHERE qq='$qq' AND `date`=current_date AND company='$company' LIMIT 1"); //查询当日用时记录是否已存在，如果不存在插入一个
+                    $re_t1 = mysql_query("SELECT time FROM setting WHERE company='$company' LIMIT 1");//查询规定每日用时
 
 
 
@@ -86,11 +104,11 @@ switch($array['type']) {
                         //当日超时时间
                         $over_time = ($r['use_time'] + $min) > $set_time ? ($r['use_time'] + $min) - $set_time : 0; 
                         
-                        mysql_query("UPDATE time SET use_time=use_time+'$min', over_time='$over_time' WHERE qq='$qq' AND `date`=current_date");
+                        mysql_query("UPDATE time SET use_time=use_time+'$min', over_time='$over_time' WHERE qq='$qq' AND `date`=current_date AND company='$company'");
 
                     } else {
                         $over_time = $min > $set_time ? $min - $set_time : 0;
-                        mysql_query("INSERT INTO time (name, qq, use_time, `date`, over_time) VALUES('$name', '$qq', '$min', current_date, '$over_time')");
+                        mysql_query("INSERT INTO time (name, qq, use_time, `date`, over_time, company) VALUES('$name', '$qq', '$min', current_date, '$over_time', '$company')");
                     }
 
 
@@ -115,7 +133,7 @@ switch($array['type']) {
 
         }else {
 
-            $sql = mysql_query("SELECT name FROM item");
+            $sql = mysql_query("SELECT name FROM item WHERE company='$company'");
 
             $str = "";  //以"|"分隔的事件名称
            
@@ -151,12 +169,12 @@ switch($array['type']) {
 
 
             //插入签到记录
-            $re = mysql_query("INSERT INTO log (qq, name, item, add_time) VALUES ('$qq', '$name', '$str1', '$date')");
+            $re = mysql_query("INSERT INTO log (qq, name, item, add_time, company) VALUES ('$qq', '$name', '$str1', '$date', '$company')");
             
             if($re) {
                 if(strpos($str1, '+') !== FALSE) {
                     $item = explode("+", $str1);
-                    $re2 = mysql_query("SELECT * FROM item");  //所有事件
+                    $re2 = mysql_query("SELECT * FROM item WHERE company='$company'");  //所有事件
 
                     $all_min = 0;  //设定的超时时间
                     while ( $arr = mysql_fetch_array($re2)) {
@@ -168,7 +186,7 @@ switch($array['type']) {
                     }
                 } else {
                     $item = $str1;
-                    $re2 = mysql_query("SELECT * FROM item WHERE name='$item'");  //查找对应事件
+                    $re2 = mysql_query("SELECT * FROM item WHERE name='$item' AND company='$company'");  //查找对应事件
                     $arr = mysql_fetch_array($re2);
                     $all_min = $arr['time'];
                 }

@@ -16,7 +16,7 @@ header( "Pragma:   public ");
 if(isset($_GET['kw'])) {
 
     $keyword = trim($_GET['kw']); 
-    $sql = "company={$_SESSION['company']}";
+    $sql = "company='".$_SESSION['company']."'";
 
     if($_GET['kw'] != "") {
       if(preg_match("/\d+/", $keyword)) {
@@ -71,9 +71,9 @@ if(isset($_GET['kw'])) {
 
 else {
   if($_GET['table'] == 'log') {
-	  $res = $DB->query("SELECT * FROM log WHERE company={$_SESSION['company']} ORDER BY add_time ASC");  //没有查询参数时查询全部
+	  $res = $DB->query("SELECT * FROM log WHERE company='".$_SESSION['company']."' ORDER BY add_time ASC");  //没有查询参数时查询全部
   } else{
-    $res = $DB->query("SELECT * FROM time WHERE company={$_SESSION['company']} ORDER BY `date` ASC");
+    $res = $DB->query("SELECT * FROM time WHERE company='".$_SESSION['company']."' ORDER BY `date` ASC");
   }
 }
 
