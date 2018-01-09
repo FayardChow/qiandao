@@ -3,6 +3,7 @@
  * 登录
 **/
 $mod='blank';
+header('Content-Type: text/html; charset=utf-8');
 include("../includes/common.php");
 if(isset($_POST['user']) && isset($_POST['pass'])){
 	$user=daddslashes($_POST['user']);
