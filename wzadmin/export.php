@@ -78,13 +78,15 @@ else {
 }
 
 if($_GET['table'] == 'log') {
+  echo "QQ\t昵称\t项目\t添加时间\t签回时间\t用时\t超时\r\n";
   while($row = $DB->fetch($res)) {
   	echo $row['qq']."\t".$row['name']."\t".$row['item']."\t".$row['add_time']."\t".$row['back_time']."\t".$row['use_time']."\t".$row['over_time'];
   	echo "\r\n";
   }
 } else {
+    echo "QQ\t昵称\t用时\t超时\t次数\t日期\r\n";
    while($row = $DB->fetch($res)) {
-    echo $row['qq']."\t".$row['name']."\t".$row['use_time']."\t".$row['over_time']."\t".$row['date'];
+    echo $row['qq']."\t".$row['name']."\t".$row['use_time']."\t".$row['over_time']."\t".$row['times']."\t".$row['date'];
     echo "\r\n";
   } 
 }
