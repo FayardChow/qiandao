@@ -104,7 +104,7 @@ switch($array['type']) {
                         //当日超时时间
                         $over_time = ($r['use_time'] + $min) > $set_time ? ($r['use_time'] + $min) - $set_time : 0; 
                         
-                        mysql_query("UPDATE time SET use_time=use_time+'$min', over_time='$over_time' WHERE qq='$qq' AND `date`=current_date AND company='$company'");
+                        mysql_query("UPDATE time SET use_time=use_time+'$min', over_time='$over_time', times=times+1 WHERE qq='$qq' AND `date`=current_date AND company='$company'");
 
                     } else {
                         $over_time = $min > $set_time ? $min - $set_time : 0;

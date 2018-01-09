@@ -139,7 +139,7 @@ echo $con;
       <div class="table-responsive">
 	  <form name="form1" method="post" action="time.php?my=del2">
         <table class="table table-striped">
-          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>用时</th><th>超时</th><th>日期</th><th>操作</th></tr></thead>
+          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>用时</th><th>超时</th><th>次数</th><th>日期</th><th>操作</th></tr></thead>
           <tbody>
 <?php
 $pagesize=30;
@@ -159,7 +159,7 @@ $offset=$pagesize*($page - 1);
 $rs=$DB->query("SELECT * FROM time WHERE {$sql} AND company='".$_SESSION['company']."' order by `date` desc limit $offset,$pagesize");
 while($res = $DB->fetch($rs))
 {
-echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"></td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res['use_time'].'</td><td>'.$res['over_time'].'</td><td>'.$res['date'].'</td><td><a href="./time.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a></td></tr>';
+echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"></td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res['use_time'].'</td><td>'.$res['over_time'].'</td><td>'.$res['times'].'</td><td>'.$res['date'].'</td><td><a href="./time.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a></td></tr>';
 }
 ?>
           </tbody>

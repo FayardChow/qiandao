@@ -188,7 +188,7 @@ echo $con;
       <div class="table-responsive">
 	  <form name="form1" method="post" action="stuff.php?my=del2">
         <table class="table table-striped">
-          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>今日用时</th><th>操作</th></tr></thead>
+          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>今日用时</th><th>今日次数</th><th>操作</th></tr></thead>
           <tbody>
 <?php
 $pagesize=30;
@@ -208,9 +208,9 @@ $offset=$pagesize*($page - 1);
 $rs=$DB->query("SELECT * FROM stuff WHERE {$sql} AND company='".$_SESSION['company']."' order by id asc limit $offset,$pagesize");
 while($res = $DB->fetch($rs))
 {
-	$rs_t = $DB->query("SELECT `use_time` FROM time WHERE qq='{$res['qq']}' AND `date`=current_date"); //查询当日用时记录
+	$rs_t = $DB->query("SELECT `use_time`,`times` FROM time WHERE qq='{$res['qq']}' AND `date`=current_date"); //查询当日用时记录和使用次数
 	$res_t = $DB->fetch($rs_t);
-	echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> '.htmlspecialchars($res['user']).'</td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res_t['use_time'].'</td><td><a href="./stuff.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a>&nbsp;&nbsp;<a href="#" class="btn btn-xs btn-success btn-edit" data-toggle="modal" data-target="#myModal" id="'.$res['Id'].'">编辑</a></td></tr>';
+	echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> '.htmlspecialchars($res['user']).'</td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res_t['use_time'].'</td><td>'.$res_t['times'].'</td><td><a href="./stuff.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a>&nbsp;&nbsp;<a href="#" class="btn btn-xs btn-success btn-edit" data-toggle="modal" data-target="#myModal" id="'.$res['Id'].'">编辑</a></td></tr>';
 }
 ?>
           </tbody>
