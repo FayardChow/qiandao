@@ -43,6 +43,10 @@ while ($row = mysql_fetch_array($re)) {
                 }
             }
         }
+        //如果预计时间超过网站设置的单次最大时间，则以设置的最大时间为准
+        $re3 = mysql_query("SELECT max_time FROM setting  WHERE company='$company'");
+        $arr = mysql_fetch_array($re3);
+        $all_min = $all_min > $arr['max_time'] ? $arr['max_time'] : $all_min;          
     } else {
         $item = $row['item'];
         $re2 = mysql_query("SELECT * FROM item WHERE name='$item' AND company='$company'");  //查找对应事件

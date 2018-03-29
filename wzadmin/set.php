@@ -19,7 +19,7 @@ if(isset($_POST['group'])) {
 	$r = $DB->query("SELECT * FROM setting WHERE company='".$_SESSION['company']."' LIMIT 1");
 
 	if($row = $DB->fetch($r)) {
-		$rs=$DB->query("UPDATE setting SET `group`='".$_POST['group']."', `time`='".$_POST['time']."' WHERE company='".$_SESSION['company']."'");
+		$rs=$DB->query("UPDATE setting SET `group`='".$_POST['group']."', `time`='".$_POST['time']."', `max_time`='".$_POST['max_time']."' WHERE company='".$_SESSION['company']."'");
 	}else {
 		$rs=$DB->query("INSERT INTO setting (`group`,`time`) VALUES ({$_POST['group']}, {$_POST['time']})");
 	}
@@ -36,12 +36,13 @@ if(isset($_POST['group'])) {
 
 
 
-$rs=$DB->query("SELECT `group`,`time`, `company` FROM setting WHERE company='".$_SESSION['company']."' LIMIT 1");
+$rs=$DB->query("SELECT `group`,`time`, `company`, `max_time` FROM setting WHERE company='".$_SESSION['company']."' LIMIT 1");
 if($rs) {
 	$res = $DB->fetch($rs);
 	$group = $res['group'];  //群号
 	$time = $res['time'];    //每日用时
 	$company = $res['company'];  //公司名称
+	$max_time = $res['max_time'];   //单次离开最大时间值
 }
 
 
@@ -97,7 +98,11 @@ if($rs) {
 					<div class="input-group">
 						<span class="input-group-addon">每日超时</span>
 						<input type="text" name="time" value="<?php echo $time; ?>" class="form-control" placeholder="" autocomplete="on" required="">
-					</div><br>	
+					</div><br>
+					<div class="input-group">
+						<span class="input-group-addon">单次超时</span>
+						<input type="text" name="max_time" value="<?php echo $max_time; ?>" class="form-control" placeholder="" autocomplete="on" required="">
+					</div><br>						
 					<div class="input-group">
 						<span class="input-group-addon">公司名称</span>
 						<input type="text" value="<?php echo $company; ?>" class="form-control" placeholder="" autocomplete="on" required="" disabled="disabled">

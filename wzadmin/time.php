@@ -176,22 +176,22 @@ $next=$page+1;
 $last=$pages;
 if ($page>1)
 {
-echo '<li><a href="index.php?page='.$first.$link.'">首页</a></li>';
-echo '<li><a href="index.php?page='.$prev.$link.'">&laquo;</a></li>';
+echo '<li><a href="time.php?page='.$first.$link.'">首页</a></li>';
+echo '<li><a href="time.php?page='.$prev.$link.'">&laquo;</a></li>';
 } else {
 echo '<li class="disabled"><a>首页</a></li>';
 echo '<li class="disabled"><a>&laquo;</a></li>';
 }
 for ($i=1;$i<$page;$i++)
-echo '<li><a href="index.php?page='.$i.$link.'">'.$i .'</a></li>';
+echo '<li><a href="time.php?page='.$i.$link.'">'.$i .'</a></li>';
 echo '<li class="disabled"><a>'.$page.'</a></li>';
 for ($i=$page+1;$i<=$pages;$i++)
-echo '<li><a href="index.php?page='.$i.$link.'">'.$i .'</a></li>';
+echo '<li><a href="time.php?page='.$i.$link.'">'.$i .'</a></li>';
 echo '';
 if ($page<$pages)
 {
-echo '<li><a href="index.php?page='.$next.$link.'">&raquo;</a></li>';
-echo '<li><a href="index.php?page='.$last.$link.'">尾页</a></li>';
+echo '<li><a href="time.php?page='.$next.$link.'">&raquo;</a></li>';
+echo '<li><a href="time.php?page='.$last.$link.'">尾页</a></li>';
 } else {
 echo '<li class="disabled"><a>&raquo;</a></li>';
 echo '<li class="disabled"><a>尾页</a></li>';
