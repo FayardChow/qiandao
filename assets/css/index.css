@@ -1,0 +1,17 @@
+.progress {
+	padding-top: 50px;
+}
+
+.progress .layui-progress{
+	margin-bottom: 20px;
+}
+
+.action-btn {
+	width: 500px;
+	margin: 0 auto;
+}
+
+.layui-btn-disabled {
+	border: 1px solid #1e9fff!important;
+	color: #1e9fff!important;
+}

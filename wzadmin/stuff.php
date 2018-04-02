@@ -84,6 +84,7 @@ elseif($my == "edit") {
 	$qq = $_GET['qq'];
 	$name = $_GET['name'];
 	$id = $_GET['id'];
+	$pass = $_GET['pass'];
 
 	if(!preg_match("/\d{6,}/", $qq)) 
 		exit("<script language='javascript'>alert('QQ格式不正确');history.go(-1);</script>");
@@ -188,7 +189,7 @@ echo $con;
       <div class="table-responsive">
 	  <form name="form1" method="post" action="stuff.php?my=del2">
         <table class="table table-striped">
-          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>今日用时</th><th>今日次数</th><th>操作</th></tr></thead>
+          <thead><tr><th>选择</th><th>QQ</th><th>姓名</th><th>密码</th><th>今日用时</th><th>今日次数</th><th>操作</th></tr></thead>
           <tbody>
 <?php
 $pagesize=30;
@@ -210,7 +211,7 @@ while($res = $DB->fetch($rs))
 {
 	$rs_t = $DB->query("SELECT `use_time`,`times` FROM time WHERE qq='{$res['qq']}' AND `date`=current_date"); //查询当日用时记录和使用次数
 	$res_t = $DB->fetch($rs_t);
-	echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> '.htmlspecialchars($res['user']).'</td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res_t['use_time'].'</td><td>'.$res_t['times'].'</td><td><a href="./stuff.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a>&nbsp;&nbsp;<a href="#" class="btn btn-xs btn-success btn-edit" data-toggle="modal" data-target="#myModal" id="'.$res['Id'].'">编辑</a></td></tr>';
+	echo '<tr><td><input type="checkbox" name="checkbox[]" value="'.$res['Id'].'"> '.htmlspecialchars($res['user']).'</td><td>'.($res['qq']).'</td><td>'.$res['name'].'</td><td>'.$res['pass'].'</td><td>'.$res_t['use_time'].'</td><td>'.$res_t['times'].'</td><td><a href="./stuff.php?my=del&id='.$res['Id'].'" class="btn btn-xs btn-danger" onclick="return confirm(\'你确实要删除此记录吗？\');">删除</a>&nbsp;&nbsp;<a href="#" class="btn btn-xs btn-success btn-edit" data-toggle="modal" data-target="#myModal" id="'.$res['Id'].'">编辑</a></td></tr>';
 }
 ?>
           </tbody>
@@ -256,11 +257,11 @@ echo'</ul>';
   	$('.btn-edit').click(function() {
   		var qq = $(this).parent().parent().find('td:eq(1)').text();
   		var name = $(this).parent().parent().find('td:eq(2)').text();
-
+			var pass = $(this).parent().parent().find('td:eq(3)').text();
   		$('#edit-id').attr('value', $(this).attr('id'));
   		$('.modal-dialog').find('[name=qq]').val(qq);
   		$('.modal-dialog').find('[name=name]').val(name);
-
+			$('.modal-dialog').find('[name=pass]').val(pass);
   	})
 
   </script>
@@ -287,6 +288,10 @@ echo'</ul>';
 				    <label class="sr-only" for="name">姓名</label>
 				    <input type="text" class="form-control" id="name" placeholder="姓名" name="name">
 				  </div>
+				  <div class="form-group">
+				    <label class="sr-only" for="name">密码</label>
+				    <input type="text" class="form-control" id="pass" placeholder="密码" name="pass">
+				  </div>					
 				  <div class="form-group" style="display: none;">
 				    <input type="text" class="form-control" name="my" value="edit">
 				  </div>

@@ -6,22 +6,22 @@ $mod='blank';
 include("../includes/common.php");
 $title='网站设置';
 include './head.php';
-if($_SESSION['islogin']==1){}else exit("<script language='javascript'>window.location.href='./login.php';</script>");
 
-if(isset($_POST['group'])) {
+if($_SESSION['islogin'] != 1) {
+	exit("<script language='javascript'>window.location.href='./login.php';</script>");
+}
 
-	if(!preg_match("/^\d{6,}$/", $_POST['group'])) {
-		exit("<script language='javascript'>alert('群号格式错误');history.go(-1);</script>");
-	}
+if(isset($_POST['do'])) {
+
 	if(!preg_match("/^\d+$/", $_POST['time'])) {
 		exit("<script language='javascript'>alert('时间格式错误');history.go(-1);</script>");
 	}
 	$r = $DB->query("SELECT * FROM setting WHERE company='".$_SESSION['company']."' LIMIT 1");
 
 	if($row = $DB->fetch($r)) {
-		$rs=$DB->query("UPDATE setting SET `group`='".$_POST['group']."', `time`='".$_POST['time']."', `max_time`='".$_POST['max_time']."' WHERE company='".$_SESSION['company']."'");
+		$rs=$DB->query("UPDATE setting SET `time`='".$_POST['time']."', `max_time`='".$_POST['max_time']."', `max_times`='".$_POST['max_times']."' WHERE company='".$_SESSION['company']."'");
 	}else {
-		$rs=$DB->query("INSERT INTO setting (`group`,`time`) VALUES ({$_POST['group']}, {$_POST['time']})");
+		$rs=$DB->query("INSERT INTO setting (`time`, `max_time`, `max_times`) VALUES ({$_POST['time']}, {$_POST['max_time']}, {$_POST['max_time']})");
 	}
 
 	
@@ -31,25 +31,24 @@ if(isset($_POST['group'])) {
 	else{
 		$res='设置失败';
 	}
-	exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
+	//exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
 }
 
 
 
-$rs=$DB->query("SELECT `group`,`time`, `company`, `max_time` FROM setting WHERE company='".$_SESSION['company']."' LIMIT 1");
+$rs=$DB->query("SELECT `time`, `company`, `max_time`, `max_times` FROM setting WHERE company='".$_SESSION['company']."' LIMIT 1");
 if($rs) {
 	$res = $DB->fetch($rs);
-	$group = $res['group'];  //群号
 	$time = $res['time'];    //每日用时
 	$company = $res['company'];  //公司名称
 	$max_time = $res['max_time'];   //单次离开最大时间值
+	$max_times = $res['max_times'];  // 每日最多离开次数
 }
 
 
 
 
 ?>
-
 <nav class="navbar navbar-fixed-top navbar-default">
 <div class="container">
   <div class="navbar-header">
@@ -90,11 +89,7 @@ if($rs) {
 					<div class="panel-heading"><h3 class="panel-title">站点配置</h3></div>
 			<div class="panel-body">
 				<form action="?" method="post" class="form-horizontal" role="form"> 
-				<input type="hidden" name="do" value="set">
-					<div class="input-group">
-						<span class="input-group-addon">签到群号</span>
-						<input type="text" name="group" value="<?php echo $group; ?>" class="form-control" placeholder="" autocomplete="on" required="">
-					</div><br>			
+				<input type="hidden" name="do" value="set">		
 					<div class="input-group">
 						<span class="input-group-addon">每日超时</span>
 						<input type="text" name="time" value="<?php echo $time; ?>" class="form-control" placeholder="" autocomplete="on" required="">
@@ -102,7 +97,11 @@ if($rs) {
 					<div class="input-group">
 						<span class="input-group-addon">单次超时</span>
 						<input type="text" name="max_time" value="<?php echo $max_time; ?>" class="form-control" placeholder="" autocomplete="on" required="">
-					</div><br>						
+					</div><br>
+					<div class="input-group">
+						<span class="input-group-addon">每日限次</span>
+						<input type="text" name="max_times" value="<?php echo $max_times; ?>" class="form-control" placeholder="" autocomplete="on" required="">
+					</div><br>											
 					<div class="input-group">
 						<span class="input-group-addon">公司名称</span>
 						<input type="text" value="<?php echo $company; ?>" class="form-control" placeholder="" autocomplete="on" required="" disabled="disabled">
