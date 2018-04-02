@@ -38,7 +38,7 @@ $data = new stdClass();
 
 if(isset($_POST['action'])) {
 	$action = $_POST['action'];  // 操作
-	$re = mysqli_query($con, "SELECT name, company FROM stuff WHERE qq={$qq} LIMIT 1");
+    $re = mysqli_query($con, "SELECT name, company FROM stuff WHERE qq='$qq' LIMIT 1");
 	if($row = mysqli_fetch_assoc($re)) {
 		$name = $row['name'];   // 姓名
 		$company = $row['company'];  // 所属公司
