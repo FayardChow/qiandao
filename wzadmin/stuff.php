@@ -98,12 +98,12 @@ elseif($my == "edit") {
 
 		$row = $DB->fetch($re);
 	
-		if($row['qq'] == $qq && $row['name'] == $name) {
+		if($row['qq'] == $qq && $row['name'] == $name && $row['pass'] == $pass) {
 			exit("<script language='javascript'>alert('无更改');history.go(-1);</script>");
 		}
 			
 		else {
-			$sql = $DB->query("UPDATE stuff SET qq='$qq', name='$name' WHERE Id='$id'");  //更新会员资料
+			$sql = $DB->query("UPDATE stuff SET qq='$qq', name='$name', pass='$pass' WHERE Id='$id'");  //更新会员资料
 			if($sql) {
 				$DB->query("UPDATE log SET qq='$qq', name='$name' WHERE qq='{$row['qq']}'");  //更新现有数据记录
 				$DB->query("UPDATE time SET qq='$qq', name='$name' WHERE qq='{$row['qq']}'"); //更新现有用时记录
