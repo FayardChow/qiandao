@@ -86,7 +86,7 @@ elseif($my == "edit") {
 	$id = $_GET['id'];
 	$pass = $_GET['pass'];
 
-	if(!preg_match("/\d{6,}/", $qq)) 
+	if(!preg_match("/\S{3,}/", $qq)) 
 		exit("<script language='javascript'>alert('QQ格式不正确');history.go(-1);</script>");
 
 	$nrows = $DB->count("SELECT count(*) FROM stuff WHERE (name='$name' OR qq='$qq') AND Id!='$id' AND company='".$_SESSION['company']."'");
@@ -144,7 +144,7 @@ if(isset($_GET['kw'])) {
 	if($_GET['qq'] != "" && $_GET['name'] != "") {
 		$name = trim($_GET['name']);
 		$qq = trim($_GET['qq']);
-		if(preg_match("/\d{6,}/", $qq)) {
+		if(preg_match("/\S{3,}/", $qq)) {
 
 			$nrows = $DB->count("SELECT count(*) FROM stuff WHERE name='$name' AND company='".$_SESSION['company']."' OR qq='$qq' LIMIT 1");  //查询qq或姓名是否已存在
 			
