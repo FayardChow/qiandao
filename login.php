@@ -35,8 +35,8 @@ if($_COOKIE['qq'] && $_COOKIE['md5str'] && $_COOKIE['company']) {
 if(isset($_POST['qq'])) {
     $qq = $_POST['qq'];
     $password = $_POST['password'];
-    if(!preg_match("/\d{6,}/", $qq)) {
-        exit('<script>alert("QQ号格式不正确");window.location.href="/login.php"</script>');
+    if(!preg_match("/\S{3,}/", $qq)) {
+        exit('<script>alert("帐号格式不正确");window.location.href="/login.php"</script>');
     }
     if(!$password) {
         exit('<script>alert("密码不能为空");window.location.href="/login.php"</script>');
@@ -81,7 +81,7 @@ if(isset($_POST['qq'])) {
     <div class="wrap">
         <form class="layui-form" method="post" action="/login.php">
             <div class="layui-form-item">
-            <label class="layui-form-label">QQ号</label>
+            <label class="layui-form-label">帐号</label>
             <div class="layui-input-inline">
                 <input type="text" name="qq" required  lay-verify="required" placeholder="请输入QQ号" autocomplete="off" class="layui-input">
             </div>
