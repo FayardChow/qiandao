@@ -89,7 +89,7 @@ elseif($my == "edit") {
 	if(!preg_match("/\S{3,}/", $qq)) 
 		exit("<script language='javascript'>alert('QQ格式不正确');history.go(-1);</script>");
 
-	$nrows = $DB->count("SELECT count(*) FROM stuff WHERE (name='$name' OR qq='$qq') AND Id!='$id' AND company='".$_SESSION['company']."'");
+	$nrows = $DB->count("SELECT count(*) FROM stuff WHERE (name='$name' OR qq='$qq') AND Id!='$id'");
 
 	if($nrows) {
 		exit("<script language='javascript'>alert('qq或姓名已占用');history.go(-1);</script>");
@@ -116,12 +116,6 @@ elseif($my == "edit") {
 
 }
 
-
-
-
-
-
-
 //默认列表
 else{
 
@@ -146,7 +140,7 @@ if(isset($_GET['kw'])) {
 		$qq = trim($_GET['qq']);
 		if(preg_match("/\S{3,}/", $qq)) {
 
-			$nrows = $DB->count("SELECT count(*) FROM stuff WHERE name='$name' AND company='".$_SESSION['company']."' OR qq='$qq' LIMIT 1");  //查询qq或姓名是否已存在
+			$nrows = $DB->count("SELECT count(*) FROM stuff WHERE name='$name' OR qq='$qq' LIMIT 1");  //查询qq或姓名是否已存在
 			
 			if($nrows) {
 				exit("<script language='javascript'>alert('qq或姓名已占用');history.go(-1);</script>");
