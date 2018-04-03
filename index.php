@@ -119,6 +119,31 @@
   <title>签到系统</title>
   <link rel="stylesheet" href="/assets/layui-v2.2.5/css/layui.css">
   <link rel="stylesheet" href="/assets/css/index.css">
+  <script type="text/javascript">
+  var userAgent = navigator.userAgent.toLowerCase();
+  var platform;
+  var flag;
+  if (userAgent == null || userAgent == '') {
+    platform = 'WEB';
+  } else {
+    if (userAgent.indexOf("android") != -1) {
+      platform = 'ANDROID';
+      flag = true;
+    } else if (userAgent.indexOf("ios") != -1 || userAgent.indexOf("iphone") != -1 || userAgent.indexOf("ipad") != -1) {
+      platform = 'IOS';
+      flag = true;
+    } else if (userAgent.indexOf("windows phone") != -1) {
+      platform = 'WP';
+      flag = true;
+    } else {
+      platform = 'WEB';
+      flag = false;
+    }
+  }
+  if(flag) {
+      window.location.href='404.html';
+  }
+  </script>
 </head>
 <body>
 	<!-- 导航开始 -->
