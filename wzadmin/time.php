@@ -54,6 +54,13 @@ $my=isset($_GET['my'])?$_GET['my']:null;
 //单个删除
 if($my=='del'){
 $id=intval($_GET['id']);
+$res = $DB->query("SELECT * FROM time WHERE Id='$id'");
+if($row = $DB->fetch($res)) {
+  $myfile = fopen("../logs.txt", "a") or die("Unable to open file!");
+  $txt = date("Y-m-d H:i:s")."删除用时记录：".$row['qq'].' '.$row['name'].' '.$row['use_time'].' '.$row['times'].' '.$row['date'].' '.$row['over_time'].' '.$row['company'];
+  fwrite($myfile, "\r\n". $txt);
+  fclose($myfile); 
+}
 $sql=$DB->query("DELETE FROM time WHERE Id='$id'");
 if($sql){$res='删除成功！';}
   else{$res='删除失败！';}
@@ -65,6 +72,14 @@ elseif($my=='del2'){
 $checkbox=$_POST['checkbox'];
 $i=0;
 foreach($checkbox as $id){
+  $res = $DB->query("SELECT * FROM time WHERE Id='$id'");
+  if($row = $DB->fetch($res)) {
+    $myfile = fopen("../logs.txt", "a") or die("Unable to open file!");
+    $txt = date("Y-m-d H:i:s")."删除用时记录：".$row['qq'].' '.$row['name'].' '.$row['use_time'].' '.$row['times'].' '.$row['date'].' '.$row['over_time'].' '.$row['company'];
+    fwrite($myfile, "\r\n". $txt);
+    fclose($myfile);  
+  }
+
 	$DB->query("DELETE FROM time WHERE Id='$id'");
 	$i++;
 }
@@ -79,9 +94,6 @@ elseif($my=='qk'){
   exit("<script language='javascript'>alert('{$res}');history.go(-1);</script>");
 
 }
-
-
-
 
 //默认列表
 else{
