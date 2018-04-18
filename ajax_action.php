@@ -86,27 +86,6 @@ if(isset($_POST['action'])) {
                     $name = "无名氏";
                 }
 
-                //更新日用时记录
-                $re_t = mysqli_query($con, "SELECT * FROM time WHERE qq='$qq' AND `date`=current_date AND company='$company' LIMIT 1"); //查询当日用时记录是否已存在，如果不存在插入一个
-                $re_t1 = mysqli_query($con, "SELECT time FROM setting WHERE company='$company' LIMIT 1");//查询规定每日用时
-
-
-
-                //如果查询到规定用时，则按规定用时,否则默认120分钟
-                $set_time = ($r2 = mysqli_fetch_assoc($re_t1)) ? $r2['time'] : 120;  
-                if($r = mysqli_fetch_assoc($re_t)) {
-                    //当日超时时间
-                    $over_time = ($r['use_time'] + $min) > $set_time ? ($r['use_time'] + $min) - $set_time : 0; 
-                    
-                    mysqli_query($con, "UPDATE time SET use_time=use_time+'$min', over_time='$over_time', times=times+1 WHERE qq='$qq' AND `date`=current_date AND company='$company'");
-
-                } else {
-                    $over_time = $min > $set_time ? $min - $set_time : 0;
-                    mysqli_query($con, "INSERT INTO time (name, qq, use_time, `date`, over_time, company, times) VALUES('$name', '$qq', '$min', current_date, '$over_time', '$company', 1)");
-                }
-
-
-
                 $over_time = $min - $all_min;  //超时时间
                 $id = $row['Id'];
                 mysqli_query($con, "UPDATE log SET use_time='$min' WHERE Id='$id'");  //更新用时记录
@@ -116,9 +95,31 @@ if(isset($_POST['action'])) {
                     $over_msg = "";
                     $over_time = 0;
                 }
-
                 mysqli_query($con, "UPDATE log SET over_time='$over_time' WHERE Id='$id'");  //更新超时记录
-           
+
+                //更新日用时记录
+                $re_t = mysqli_query($con, "SELECT Id FROM time WHERE qq='$qq' AND `date`=current_date AND company='$company' LIMIT 1"); //查询当日用时记录是否已存在，如果不存在插入一个
+                $re_t1 = mysqli_query($con, "SELECT time FROM setting WHERE company='$company' LIMIT 1");//查询规定每日用时
+                //如果查询到规定用时，则按规定用时,否则默认120分钟
+                $set_time = ($r2 = mysqli_fetch_assoc($re_t1)) ? $r2['time'] : 120;  
+                if($r = mysqli_fetch_assoc($re_t)) {
+                    //当日超时时间
+                    $re = mysqli_query($con, "SELECT use_time FROM log WHERE qq='$qq' AND to_days(`add_time`)=to_days(now())");
+                    $use_time = 0;  // 当日使用时间
+                    $times = 0;     // 当日使用次数
+                    while ($row = mysqli_fetch_assoc($re)) {
+                        $use_time += $row['use_time'];
+                        $times ++;
+                    }
+                    $over_time = $use_time > $set_time ? $use_time - $set_time : 0; 
+                    
+                    mysqli_query($con, "UPDATE time SET use_time='$use_time', over_time='$over_time', times='$times' WHERE qq='$qq' AND `date`=current_date AND company='$company'");
+
+                } else { 
+                    $over_time = $min > $set_time ? $min - $set_time : 0;
+                    mysqli_query($con, "INSERT INTO time (name, qq, use_time, `date`, over_time, company, times) VALUES('$name', '$qq', '$min', current_date, '$over_time', '$company', 1)");
+                }
+
                 // 返回信息
                 $data->flag = 1;
                 $data->msg = "签回成功,用时：".$min."分钟".$over_msg;
@@ -188,4 +189,19 @@ if(isset($_POST['action'])) {
         exit($reJSON);	        
     }
 
+} else if(isset($_GET['barrager'])) {  // 弹幕信息，返回同团队未签到的记录
+    $re = mysqli_query($con, "SELECT name,item,add_time FROM log WHERE company='".$_COOKIE['company']."' AND ISNULL(back_time)");
+    $barrages = array();
+    while($row = mysqli_fetch_assoc($re)) {
+        $arr = array(
+            'info'  => $row['name'].' '.$row['item'].' '.$row['add_time'],
+            'img'   => 'http://yaseng.org/jquery.barrager.js/static/img/heisenberg.png',
+            'speed' =>  30, //延迟,单位秒,默认6
+            'href'  =>  'javascript:;'
+        );
+        array_push($barrages, $arr);
+    }
+
+    //随机输出一个 
+    echo json_encode($barrages[array_rand($barrages)]);
 }
